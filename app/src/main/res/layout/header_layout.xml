@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3700ff">
+
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:id="@+id/iv_pin_location"
+        android:src="@drawable/pin"
+        android:layout_marginTop="14dp"
+        android:layout_marginStart="12dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="สาย 73ก"
+        android:textSize="13dp"
+        android:id="@+id/tv_bus_route"
+        android:textColor="#fbfbfb"
+        android:layout_alignTop="@+id/iv_pin_location"
+        android:layout_alignStart="@+id/tv_stop_name" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ลาดพร้าว"
+        android:textSize="24dp"
+        android:maxLines="2"
+        android:paddingRight="5dp"
+        android:id="@+id/tv_stop_name"
+        android:textColor="#ffffff"
+        android:layout_below="@+id/tv_bus_route"
+        android:layout_toEndOf="@+id/iv_pin_location" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/man"
+        android:layout_below="@+id/iv_pin_location"
+        android:layout_alignEnd="@+id/tv_stop_name"
+        android:layout_marginTop="10dp" />
+
+
+</RelativeLayout>

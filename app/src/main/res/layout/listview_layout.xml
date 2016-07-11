@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:src="@drawable/bus_icon"
+        android:layout_alignTop="@+id/lv_bmta_id"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="14dp" />
+
+    <TextView
+        android:id="@+id/lv_bmta_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:text="0-00000"
+        android:paddingTop="0dp"
+        android:layout_marginTop="17dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/icon"
+        android:layout_marginStart="12dp" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="50sp"
+        android:text="13"
+        android:paddingTop="0dp"
+        android:textColor="#000000"
+        android:id="@+id/lv_predict_time"
+        android:layout_below="@+id/icon"
+        android:layout_alignStart="@+id/lv_in_text" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:text="นาที"
+        android:id="@+id/lv_min_text"
+        android:layout_alignBottom="@+id/lv_predict_time"
+        android:layout_toEndOf="@+id/lv_predict_time" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:text="ถึงใน"
+        android:id="@+id/lv_in_text"
+        android:layout_marginEnd="63dp"
+        android:layout_alignBaseline="@+id/lv_bmta_id"
+        android:layout_alignBottom="@+id/lv_bmta_id"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ป้ายที่รถอยู่"
+        android:textSize="23sp"
+        android:textColor="#000000"
+        android:id="@+id/lv_stop_name"
+        android:paddingRight="13dp"
+        android:paddingTop="13dp"
+        android:layout_below="@+id/icon"
+        android:layout_alignStart="@+id/icon"
+        android:layout_toStartOf="@+id/lv_predict_time" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ก่อนหน้า"
+        android:textSize="23sp"
+        android:textColor="#000000"
+        android:id="@+id/lv_previous_stop"
+        android:layout_below="@+id/lv_predict_time"
+        android:layout_alignStart="@+id/lv_predict_time" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="10sp"
+        android:id="@+id/man"
+        android:layout_below="@+id/lv_previous_stop"
+        android:layout_toEndOf="@+id/lv_stop_name" />
+
+
+
+
+</RelativeLayout>
