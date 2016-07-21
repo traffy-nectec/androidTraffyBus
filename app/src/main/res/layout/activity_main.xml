@@ -1,99 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v4.widget.SwipeRefreshLayout
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_swipe"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main_swipe"
-    android:layout_alignParentTop="true"
-    android:layout_above="@+id/im_net_connect">
+    android:layout_above="@+id/im_net_connect"
+    android:layout_alignParentTop="true">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="{relativePackage}.${activityClass}"
-        android:background="#ffffff">
+        android:background="#ffffff"
+        android:orientation="vertical"
+        tools:context="{relativePackage}.${activityClass}">
 
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/swt_noti"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:checked="false"
+            android:paddingLeft="10dp"
+            android:text="เปิดการแจ้งเตือน"
+            android:textColor="#fff" />
 
         <ListView
             android:id="@+id/lv_header"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_marginBottom="400dp"
-            android:layout_marginTop="0dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_marginTop="0dp" />
 
-        <ListView
-            android:id="@+id/lv_BusList"
-            android:layout_width="wrap_content"
-            android:layout_height="1000dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="55dp"
-            android:layout_marginTop="105dp"
-            android:background="#ffffff" />
-
-        <ImageView
-            android:layout_width="250dp"
-            android:layout_height="250dp"
-            android:id="@+id/im_net_connect"
-            android:src="@drawable/wifi"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
-
-        <ImageView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp"
-            android:layout_marginBottom="0dp"
-            android:paddingTop="10dp"
-            android:id="@+id/im_traffylogo"
-            android:src="@drawable/traffylogos"
-            android:background="#fff9f9"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true" />
+            android:layout_height="0dp"
+            android:layout_weight="5">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="แนะนำ ติชม"
-            android:textStyle=""
-            android:id="@+id/textView6"
-            android:layout_alignTop="@+id/im_traffylogo"
-            android:layout_centerHorizontal="true" />
+            <ListView
+                android:id="@+id/lv_BusList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#ffffff" />
 
-        <TextView
+            <TextView
+                android:id="@+id/tv_no_update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="ไม่มีข้อมูลอัพเดท"
+                android:textSize="20dp"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/im_net_connect"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/wifi" />
+
+            <TextView
+                android:id="@+id/tv_con_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ff0000"
+                android:gravity="center"
+                android:padding="1dp"
+                android:text="ไม่มีการเชื่อมต่อ internet..."
+                android:textColor="#ffffff"
+                android:textStyle="normal" />
+        </RelativeLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="15dp"
-            android:text="ไม่มีการเชื่อมต่อ internet..."
-            android:textStyle="normal"
-            android:textColor="#ffffff"
-            android:id="@+id/tv_con_txt"
-            android:gravity="center"
-            android:background="#ff0000"
-            android:layout_alignBottom="@+id/lv_header"
-            android:layout_alignParentStart="true" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:text="ไม่มีข้อมูลอัพเดท"
-            android:id="@+id/tv_no_update"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="แนะนำ ติชม"
+                android:textStyle="" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/greeting"
-            android:textColor="@android:color/white"
-            android:textSize="32sp" />
-
-    </RelativeLayout >
+            <ImageView
+                android:id="@+id/im_traffylogo"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="#fff9f9"
+                android:src="@drawable/traffylogos" />
+        </LinearLayout>
+    </LinearLayout>
 </android.support.v4.widget.SwipeRefreshLayout>

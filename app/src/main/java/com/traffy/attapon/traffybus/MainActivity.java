@@ -1,51 +1,36 @@
 package com.traffy.attapon.traffybus;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.content.Context;
-import android.database.Cursor;
+
+import android.Manifest;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.StrictMode;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.widget.Toast;
 
-import android.support.v4.widget.SwipeRefreshLayout;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks
+        , GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     ///////////// Database ////////////////////
     SQLiteDatabase mDb;
@@ -54,80 +39,202 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
 
     //////////// get gps //////////////
-    private String location = null;
-    private String locaText;
-    private double lat;
-    private double lng;
-    private LocationManager locationManager;
+    private String locaText = null;
+    private SharedPre sharedPre;
+    private SwitchCompat swt_noti;
+    private GoogleApiClient googleApiClient;
+    private LocationAvailability locationAvailability;
+    private static final int REQUEST_LOCATION = 0;
+    private LocationRequest locationRequest;
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState ) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewpager);
 
+        buildGoogleApiClient();
+
         viewPager = (ViewPager) findViewById(R.id.pager);
+        swt_noti = (SwitchCompat) findViewById(R.id.swt_noti);
+
 
         mHelper = new MyDbHelper(this);
         mDb = mHelper.getWritableDatabase();
 
+        sharedPre = new SharedPre(getApplication());
+        sharedPre.setPage(0);
+
+
         PagerAdapter adapter = new SimplePagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
 
-        getGPS();
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+                switch (position) {
+                    case 0:
+                        sharedPre.setPage(0);
+                        break;
+                    case 1:
+                        sharedPre.setPage(1);
+                        break;
+                    default:
+                        sharedPre.setPage(0);
+                }
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
 
     }
 
-    private void getGPS()
-    {
-        ///////////////////////////// get current location /////////////////////////////
-        //จัดการ Event ต่างๆ ของ Location
-        LocationListener locationListener = new LocationListener(){
-
-            //เมื่อหาตำแหน่งได้ จะทำงานที่ function นี้
-            public void onLocationChanged(Location location) {
-                // TODO Auto-generated method stub
-
-                //รับค่า Latitude และ Longitude จาก location
-                lat = location.getLatitude();
-                lng = location.getLongitude();
-
-                locaText = "lat=" + Double.toString(lat) +"&lng=" + Double.toString(lng);
-                //    gpsTextView.setText(locationText);
-
-            }
-
-            public void onProviderDisabled(String provider) {
-                // TODO Auto-generated method stub
-
-            }
-
-            public void onProviderEnabled(String provider) {
-                // TODO Auto-generated method stub
-
-            }
-
-            public void onStatusChanged(String provider, int status,
-                                        Bundle extras) {
-                // TODO Auto-generated method stub
-
-            }
-        };
-
-        //สร้าง locationManager เพื่อใช้ในการรับตำแหน่ง
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        //ระบุรูปแบบของตำแหน่งที่เราต้องการ และเชื่อมกับ locationListener
-        //LocationManager.GPS_PROVIDER รับตำแหน่งจาก GPS
-        //LocationManager.NETWORK_PROVIDER รับตำแหน่งจาก Network พวก Wifi EDGE GPRS 3G
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-
-        //   return locaText;
-
-        ///////////////////////////// get current location /////////////////////////////
+    private  void buildGoogleApiClient() {
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
     }
 
-    public String txtGPS()
-    {
+    public String txtGPS() {
         return locaText;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        googleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
+        Log.d("position", "onStop");
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        Log.d("dd", "onDestroy");
+        sharedPre.reSetSharedPreAlertNoti();
+        sharedPre.reSetSharedPre();
+        super.onDestroy();
+
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        getLocationConnect();
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+        String lat = String.valueOf(location.getLatitude());
+        String lng = String.valueOf(location.getLongitude());
+
+
+        // Log.d("Location", "lat=" + lat + " lng " + lng);
+        locaText = "lat=" + lat + "&lng=" + lng;
+
+
+    }
+
+    private void getLocationConnect() {
+        //check runtime permission
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= 23) {
+                if
+                        (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    showMessageOKCancel("อนุญาตให้ App Traffy Bus เข้าถึงตำแหน่งปัจจุบันของคุณ",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (Build.VERSION.SDK_INT >= 23) {
+                                        requestPermissions(new
+                                                        String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                                REQUEST_LOCATION);
+                                    }
+                                }
+                            });
+                    return;
+                }
+            }
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION);
+        } else {
+            locationAvailability =
+                    LocationServices.FusedLocationApi.getLocationAvailability(googleApiClient);
+
+            locationRequest = new LocationRequest()
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                    .setInterval(5000);
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient,
+                    locationRequest, this);
+
+            if (Build.VERSION.SDK_INT >= 23) {
+                if (!locationAvailability.isLocationAvailable()) {
+                    Toast.makeText(MainActivity.this, "คุณไม่ได้เปิด GPS", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                LocationManager manager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    Toast.makeText(MainActivity.this, "คุณไม่ได้เปิด GPS", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        }
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener
+            onClickListener) {
+        new AlertDialog.Builder(MainActivity.this)
+                .setMessage(message)
+                .setPositiveButton("ตกลง", onClickListener)
+                .setNegativeButton("ยกเลิก", null)
+                .create()
+                .show();
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_LOCATION) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getLocationConnect();
+            } else {
+                // Permission was denied or request was cancelled
+            }
+        }
     }
 }
