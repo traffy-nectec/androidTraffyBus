@@ -29,6 +29,12 @@
                 android:layout_marginLeft="12dp"
                 android:text="0-00000"
                 android:textSize="13sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:text="จาก"
+                android:textSize="13sp" />
 
         </LinearLayout>
 

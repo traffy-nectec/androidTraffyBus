@@ -36,6 +36,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.traffy.attapon.traffybus.activity.BusActivity;
 import com.traffy.attapon.traffybus.util.ConnectionDetector;
 import com.traffy.attapon.traffybus.util.MyDbHelper;
 import com.traffy.attapon.traffybus.R;
@@ -95,7 +96,6 @@ public class SimpleFragment extends Fragment {
     private String locaText;
 
 
-
     ///////////// Database ////////////////////
     SQLiteDatabase mDb;
     MyDbHelper mHelper;
@@ -110,8 +110,6 @@ public class SimpleFragment extends Fragment {
     private TextView tv_bg;
     private Thread t;
     private TextView tv_stop_name;
-
-
 
 
     //////////// Swipe To Refresh //////////
@@ -228,7 +226,6 @@ public class SimpleFragment extends Fragment {
 
         return rootView;
     }
-
 
 
     private class setNormal extends AsyncTask<String, Void, String> {
@@ -468,10 +465,10 @@ public class SimpleFragment extends Fragment {
                 if (c.getString("predict_time").equals("NA") || c.getString("predict_status").equals("gps_delay")) {
 
                 } else {
-                   //  Log.d("position", sharedPre.getPage() + " shared " + swt_noti.isChecked() + " - " + sharedPre.getNoti());
+                    //  Log.d("position", sharedPre.getPage() + " shared " + swt_noti.isChecked() + " - " + sharedPre.getNoti());
                     if (position == sharedPre.getPage() && sharedPre.getNoti()) {
 
-                      //   Log.d("position ------", "" + sharedPre.getAlertNoti(c.getString("bmta_id")));
+                        //   Log.d("position ------", "" + sharedPre.getAlertNoti(c.getString("bmta_id")));
 
                         if (sharedPre.getAlertNoti(c.getString("bmta_id")) == null
                                 && Integer.parseInt(c.getString("predict_time")) <= 10) {
@@ -485,7 +482,7 @@ public class SimpleFragment extends Fragment {
 
 
                     }
-                    map.put("bmta_id", c.getString("bmta_id") + " จาก");
+                    map.put("bmta_id", c.getString("bmta_id"));
                     map.put("predict_time", c.getString("predict_time"));
                     map.put("current_stop_name", c.getString("current_stop_name"));
                     map.put("number_of_nexts", "[" + c.getString("number_of_nexts") + " ป้าย]");
@@ -570,7 +567,7 @@ public class SimpleFragment extends Fragment {
 
     private void findGpsAndShowData() {
         isInternetPresent = cd.isConnectingToInternet();
-         MainActivity mainAT = (MainActivity) getActivity();
+        MainActivity mainAT = (MainActivity) getActivity();
         locaText = mainAT.txtGPS();
         //    showToastShort(locaText);
 
@@ -594,7 +591,7 @@ public class SimpleFragment extends Fragment {
                 new setDefault().execute(jsonUrl);
             } else {
                 // showToastShort("รับ gps ได้");
-               // timeCircle = 10000;
+                // timeCircle = 10000;
 
                 //Log.d("url", "findGpsAndShowData: "+locaText);
                 jsonUrl = "http://cloud.traffy.in.th/attapon/API/private_apis/android_resource/arrival_time_next.php?" + locaText + "&radius=100000";
@@ -638,31 +635,31 @@ public class SimpleFragment extends Fragment {
         PendingIntent pIntent = PendingIntent.getActivity(getActivity(), 0, intent, 0);
 
 
-
-            Notification mNotification = new Notification.Builder(getActivity())
-                    .setContentTitle("รถหมายเลข " + bmta_id)
-                    .setContentText("จะถึงในอีก " + predict_time + " นาที  ")
-                    .setSmallIcon(R.drawable.bus_icon)
-                    .setContentIntent(pIntent)
-                    .setSound(soundUri)
-                    .build();
-            NotificationManager notificationManager = (NotificationManager) getActivity()
-                    .getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(intbmta_id, mNotification);
-
-
-
+        Notification mNotification = new Notification.Builder(getActivity())
+                .setContentTitle("รถหมายเลข " + bmta_id)
+                .setContentText("จะถึงในอีก " + predict_time + " นาที  ")
+                .setSmallIcon(R.drawable.bus_icon)
+                .setContentIntent(pIntent)
+                .setSound(soundUri)
+                .build();
+        NotificationManager notificationManager = (NotificationManager) getActivity()
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(intbmta_id, mNotification);
 
 
     }
 
-////////////////////// Listener ////////////////////////
+    ////////////////////// Listener ////////////////////////
     private class lvBusListOnItemClickListener implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            TextView textView = (TextView)view.findViewById(R.id.lv_bmta_id);
-            String str = textView.getText().toString();
-            Toast.makeText(getActivity(),str+"-- " + position+"",Toast.LENGTH_SHORT).show();
+            TextView textView = (TextView) view.findViewById(R.id.lv_bmta_id);
+            String busId = textView.getText().toString();
+            Toast.makeText(getActivity(), busId + "-- " + position + "", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getActivity(), BusActivity.class);
+            intent.putExtra("busId",busId);
+            startActivity(intent);
+
         }
     }
 
@@ -674,10 +671,10 @@ public class SimpleFragment extends Fragment {
 
             if (isChecked) {
                 sharedPre.setNoti(true);
-                swt_noti.setText("ปิดการแจ้งเตือน");
+                swt_noti.setText("เลื่อนเพื่อปิดการแจ้งเตือน");
             } else {
                 sharedPre.setNoti(false);
-                swt_noti.setText("เปิดการแจ้งเตือน");
+                swt_noti.setText("เลื่อนเพื่อเปิดการแจ้งเตือน");
             }
 
         }
