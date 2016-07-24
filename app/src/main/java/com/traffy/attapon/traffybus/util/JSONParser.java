@@ -1,4 +1,4 @@
-package com.traffy.attapon.traffybus;
+package com.traffy.attapon.traffybus.util;
 
 import android.util.Log;
 

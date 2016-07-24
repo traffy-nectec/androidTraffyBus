@@ -1,4 +1,4 @@
-package com.traffy.attapon.traffybus;
+package com.traffy.attapon.traffybus.util;
 
 /**
  * Created by Attapon on 4/4/2559.

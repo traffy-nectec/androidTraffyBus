@@ -1,13 +1,10 @@
-package com.traffy.attapon.traffybus;
+package com.traffy.attapon.traffybus.util;
 
-/**
- * Created by Attapon on 3/5/2559.
- */
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-class MyDbHelper extends SQLiteOpenHelper {
+public class MyDbHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "TRANSIT";
     private static final int DB_VERSION = 1;
     public static final String TABLE_NAME = "Stop";
@@ -31,5 +28,3 @@ class MyDbHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 }
-
-public class Database { }

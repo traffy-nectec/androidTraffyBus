@@ -1,4 +1,4 @@
-package com.traffy.attapon.traffybus;
+package com.traffy.attapon.traffybus.activity;
 
 
 import android.Manifest;
@@ -27,6 +27,10 @@ import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.traffy.attapon.traffybus.util.MyDbHelper;
+import com.traffy.attapon.traffybus.R;
+import com.traffy.attapon.traffybus.util.SharedPre;
+import com.traffy.attapon.traffybus.adapter.SimplePagerAdapter;
 
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks
