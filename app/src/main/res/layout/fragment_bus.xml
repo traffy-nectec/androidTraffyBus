@@ -4,80 +4,84 @@
     android:layout_height="match_parent"
     tools:context="com.traffy.attapon.traffybus.fragment.BusFragment">
 
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/main_layout"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_BusStopList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#ffffff"
-        android:orientation="vertical"
-        tools:context="{relativePackage}.${activityClass}">
+        android:layout_height="match_parent">
 
-        <RelativeLayout
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/main_layout"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="5">
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            android:orientation="vertical"
+            tools:context="{relativePackage}.${activityClass}">
 
-            <ListView
-                android:id="@+id/lv_BusStop"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="0dp"
+                android:layout_weight="5">
 
-            <TextView
-                android:id="@+id/tv_no_update"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:text="ไม่มีข้อมูลอัพเดท"
-                android:textSize="20dp"
-                android:visibility="invisible" />
+                <ListView
+                    android:id="@+id/lv_BusStop"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
-            <ImageView
-                android:id="@+id/im_net_connect"
-                android:layout_width="250dp"
-                android:layout_height="250dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/wifi"
-                android:visibility="gone" />
+                <TextView
+                    android:id="@+id/tv_no_update"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="ไม่มีข้อมูลอัพเดท"
+                    android:textSize="20dp"
+                    android:visibility="invisible" />
 
-            <TextView
-                android:id="@+id/tv_con_txt"
+                <ImageView
+                    android:id="@+id/im_net_connect"
+                    android:layout_width="250dp"
+                    android:layout_height="250dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/wifi"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tv_con_txt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#ff0000"
+                    android:gravity="center"
+                    android:padding="1dp"
+                    android:text="ไม่มีการเชื่อมต่อ internet..."
+                    android:textColor="#ffffff"
+                    android:textStyle="normal"
+                    android:visibility="gone" />
+            </RelativeLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#ff0000"
-                android:gravity="center"
-                android:padding="1dp"
-                android:text="ไม่มีการเชื่อมต่อ internet..."
-                android:textColor="#ffffff"
-                android:textStyle="normal"
-                android:visibility="gone" />
-        </RelativeLayout>
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="แนะนำ ติชม"
+                    android:textStyle="" />
 
-            <TextView
-                android:id="@+id/textView6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="แนะนำ ติชม"
-                android:textStyle="" />
-
-            <ImageView
-                android:id="@+id/im_traffylogo"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:background="#fff9f9"
-                android:src="@drawable/traffylogos" />
+                <ImageView
+                    android:id="@+id/im_traffylogo"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="#fff9f9"
+                    android:src="@drawable/traffylogos" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </FrameLayout>
