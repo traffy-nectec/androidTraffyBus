@@ -1,4 +1,4 @@
-package com.traffy.attapon.traffybus;
+package com.traffy.attapon.traffybus.fragment;
 
 /**
  * Created by Attapon on 2/5/2559.
@@ -13,15 +13,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
-import android.location.LocationManager;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SwitchCompat;
@@ -31,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -38,6 +35,14 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.traffy.attapon.traffybus.activity.BusActivity;
+import com.traffy.attapon.traffybus.util.ConnectionDetector;
+import com.traffy.attapon.traffybus.util.MyDbHelper;
+import com.traffy.attapon.traffybus.R;
+import com.traffy.attapon.traffybus.util.SharedPre;
+import com.traffy.attapon.traffybus.activity.MainActivity;
+import com.traffy.attapon.traffybus.adapter.SimplePagerAdapter;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -91,9 +96,6 @@ public class SimpleFragment extends Fragment {
     private String locaText;
 
 
-    ////////////// image from url ///////////////////////
-    private String urlImage = "http://cloud.traffy.in.th/attapon/API/private_apis/android_resource/traffylogo.png";
-
     ///////////// Database ////////////////////
     SQLiteDatabase mDb;
     MyDbHelper mHelper;
@@ -108,8 +110,6 @@ public class SimpleFragment extends Fragment {
     private TextView tv_bg;
     private Thread t;
     private TextView tv_stop_name;
-
-
 
 
     //////////// Swipe To Refresh //////////
@@ -152,7 +152,7 @@ public class SimpleFragment extends Fragment {
 
         cd = new ConnectionDetector(getActivity());
 
-
+        lvBuslist.setOnItemClickListener(new lvBusListOnItemClickListener());
 
         mHelper = new MyDbHelper(getActivity());
         mDb = mHelper.getWritableDatabase();
@@ -167,28 +167,11 @@ public class SimpleFragment extends Fragment {
         if (position == 1) swt_noti.setVisibility(View.GONE);
         sharedPre = new SharedPre(getActivity());
         sharedPre.setNoti(false);
-        swt_noti.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        swt_noti.setOnCheckedChangeListener(new swtNoTiOnCheckedChangeListener());
 
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                if (isChecked) {
-                    sharedPre.setNoti(true);
-                    swt_noti.setText("ปิดการแจ้งเตือน");
-                } else {
-                    sharedPre.setNoti(false);
-                    swt_noti.setText("เปิดการแจ้งเตือน");
-                }
-
-            }
-        });
-
-        // getIntentPage();
 
         isInternetPresent = cd.isConnectingToInternet();
-        //   jHaHa = jsonHaHa();
-        //   showToast(jHaHa);
+
         showHeader();
         findGpsAndShowData();
 
@@ -236,47 +219,14 @@ public class SimpleFragment extends Fragment {
         });
 
         ///////////////// check listview scroll ///////////////////////////////////
-        lvBuslist.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView absListView, int i) {
-
-            }
-
-            @Override
-            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (firstVisibleItem == 0)
-                    mSwipeRefreshLayout.setEnabled(true);
-                else
-                    mSwipeRefreshLayout.setEnabled(false);
-            }
-        });
+        lvBuslist.setOnScrollListener(new lvBusListOnScrollListener());
 
         ////////////////////// logo click ///////////////////////////
-        imgTraffyLogo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                openURLS();
-
-            }
-        });
+        imgTraffyLogo.setOnClickListener(new loGoImgOnClickListener());
 
         return rootView;
     }
 
-    private void getIntentPage() {
-        try {
-            SharedPre sharedPre = new SharedPre(getActivity());
-            Bundle bundles = getActivity().getIntent().getExtras();
-            int pageIntent = bundles.getInt("pageIntent");
-            if (pageIntent == 0) {
-                sharedPre.setPage(0);
-            }
-        } catch (NullPointerException e) {
-
-        }
-
-    }
 
     private class setNormal extends AsyncTask<String, Void, String> {
 
@@ -515,10 +465,10 @@ public class SimpleFragment extends Fragment {
                 if (c.getString("predict_time").equals("NA") || c.getString("predict_status").equals("gps_delay")) {
 
                 } else {
-                   //  Log.d("position", sharedPre.getPage() + " shared " + swt_noti.isChecked() + " - " + sharedPre.getNoti());
+                    //  Log.d("position", sharedPre.getPage() + " shared " + swt_noti.isChecked() + " - " + sharedPre.getNoti());
                     if (position == sharedPre.getPage() && sharedPre.getNoti()) {
 
-                      //   Log.d("position ------", "" + sharedPre.getAlertNoti(c.getString("bmta_id")));
+                        //   Log.d("position ------", "" + sharedPre.getAlertNoti(c.getString("bmta_id")));
 
                         if (sharedPre.getAlertNoti(c.getString("bmta_id")) == null
                                 && Integer.parseInt(c.getString("predict_time")) <= 10) {
@@ -532,7 +482,7 @@ public class SimpleFragment extends Fragment {
 
 
                     }
-                    map.put("bmta_id", c.getString("bmta_id") + " จาก");
+                    map.put("bmta_id", c.getString("bmta_id"));
                     map.put("predict_time", c.getString("predict_time"));
                     map.put("current_stop_name", c.getString("current_stop_name"));
                     map.put("number_of_nexts", "[" + c.getString("number_of_nexts") + " ป้าย]");
@@ -617,7 +567,7 @@ public class SimpleFragment extends Fragment {
 
     private void findGpsAndShowData() {
         isInternetPresent = cd.isConnectingToInternet();
-         MainActivity mainAT = (MainActivity) getActivity();
+        MainActivity mainAT = (MainActivity) getActivity();
         locaText = mainAT.txtGPS();
         //    showToastShort(locaText);
 
@@ -641,9 +591,9 @@ public class SimpleFragment extends Fragment {
                 new setDefault().execute(jsonUrl);
             } else {
                 // showToastShort("รับ gps ได้");
-               // timeCircle = 10000;
+                // timeCircle = 10000;
 
-Log.d("url", "findGpsAndShowData: "+locaText);
+                //Log.d("url", "findGpsAndShowData: "+locaText);
                 jsonUrl = "http://cloud.traffy.in.th/attapon/API/private_apis/android_resource/arrival_time_next.php?" + locaText + "&radius=100000";
                 locaText = null;
                 new setNormal().execute(jsonUrl);
@@ -685,23 +635,72 @@ Log.d("url", "findGpsAndShowData: "+locaText);
         PendingIntent pIntent = PendingIntent.getActivity(getActivity(), 0, intent, 0);
 
 
-
-            Notification mNotification = new Notification.Builder(getActivity())
-                    .setContentTitle("รถหมายเลข " + bmta_id)
-                    .setContentText("จะถึงในอีก " + predict_time + " นาที  ")
-                    .setSmallIcon(R.drawable.bus_icon)
-                    .setContentIntent(pIntent)
-                    .setSound(soundUri)
-                    .build();
-            NotificationManager notificationManager = (NotificationManager) getActivity()
-                    .getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(intbmta_id, mNotification);
-
-
-
+        Notification mNotification = new Notification.Builder(getActivity())
+                .setContentTitle("รถหมายเลข " + bmta_id)
+                .setContentText("จะถึงในอีก " + predict_time + " นาที  ")
+                .setSmallIcon(R.drawable.bus_icon)
+                .setContentIntent(pIntent)
+                .setSound(soundUri)
+                .build();
+        NotificationManager notificationManager = (NotificationManager) getActivity()
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(intbmta_id, mNotification);
 
 
     }
 
+    ////////////////////// Listener ////////////////////////
+    private class lvBusListOnItemClickListener implements AdapterView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            TextView textView = (TextView) view.findViewById(R.id.lv_bmta_id);
+            String busId = textView.getText().toString();
+            Toast.makeText(getActivity(), busId + "-- " + position + "", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getActivity(), BusActivity.class);
+            intent.putExtra("busId",busId);
+            startActivity(intent);
 
-}
+        }
+    }
+
+    private class swtNoTiOnCheckedChangeListener implements CompoundButton.OnCheckedChangeListener {
+
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+            if (isChecked) {
+                sharedPre.setNoti(true);
+                swt_noti.setText("เลื่อนเพื่อปิดการแจ้งเตือน");
+            } else {
+                sharedPre.setNoti(false);
+                swt_noti.setText("เลื่อนเพื่อเปิดการแจ้งเตือน");
+            }
+
+        }
+    }
+
+    private class lvBusListOnScrollListener implements AbsListView.OnScrollListener {
+        @Override
+        public void onScrollStateChanged(AbsListView absListView, int i) {
+
+        }
+
+        @Override
+        public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            if (firstVisibleItem == 0)
+                mSwipeRefreshLayout.setEnabled(true);
+            else
+                mSwipeRefreshLayout.setEnabled(false);
+        }
+    }
+
+    private class loGoImgOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+
+            openURLS();
+
+        }
+    }
+} //End class

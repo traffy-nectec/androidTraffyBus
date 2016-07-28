@@ -1,4 +1,4 @@
-package com.traffy.attapon.traffybus;
+package com.traffy.attapon.traffybus.adapter;
 
 /**
  * Created by Attapon on 2/5/2559.
@@ -8,7 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-class SimplePagerAdapter extends FragmentStatePagerAdapter {
+import com.traffy.attapon.traffybus.fragment.SimpleFragment;
+
+public class SimplePagerAdapter extends FragmentStatePagerAdapter {
 
     public static final String ARGS_POSITION = "name";
     public static final int NUM_PAGES = 2;

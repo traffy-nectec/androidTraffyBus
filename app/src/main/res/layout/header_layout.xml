@@ -10,36 +10,38 @@
         android:id="@+id/iv_pin_location"
         android:layout_width="70dp"
         android:layout_height="70dp"
+        android:layout_marginBottom="30dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="14dp"
-        android:layout_marginBottom="30dp"
         android:src="@drawable/pin" />
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:orientation="vertical"
-    android:layout_height="wrap_content">
-    <TextView
-        android:id="@+id/tv_bus_route"
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="สาย 73ก"
-        android:textColor="#fbfbfb"
-        android:textSize="13sp" />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_stop_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxLines="2"
-        android:paddingRight="5dp"
-        android:text="ลาดพร้าว"
-        android:ellipsize="end"
-        android:textColor="#ffffff"
-        android:textSize="@dimen/size_bus_stop" />
+        <TextView
+            android:id="@+id/tv_bus_route"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="สาย 73ก"
+            android:textColor="#fbfbfb"
+            android:textSize="13sp" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tv_stop_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:paddingRight="5dp"
+            android:text="ลาดพร้าว"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/size_bus_stop" />
+
+    </LinearLayout>
 
 
 </LinearLayout>

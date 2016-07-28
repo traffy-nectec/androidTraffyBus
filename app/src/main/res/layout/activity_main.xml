@@ -23,7 +23,7 @@
             android:background="@color/colorPrimary"
             android:checked="false"
             android:paddingLeft="10dp"
-            android:text="เปิดการแจ้งเตือน"
+            android:text="เลื่อนเพื่อเปิดการแจ้งเตือน"
             android:textColor="#fff" />
 
         <ListView
