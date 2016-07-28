@@ -5,32 +5,20 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.traffy.attapon.traffybus.DAO.BusStopItemCollectionDao;
 import com.traffy.attapon.traffybus.R;
 import com.traffy.attapon.traffybus.adapter.BusStopListAdapter;
 import com.traffy.attapon.traffybus.manager.HttpManager;
-import com.traffy.attapon.traffybus.manager.http.ApiService;
-
-import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class BusFragment extends Fragment {
@@ -75,6 +63,7 @@ public class BusFragment extends Fragment {
     }
 
     private void initInstances(View rootView) {
+        lv_BusStop.setOnScrollListener(new lvBusStopOnScrollListener());
         swipe_BusStopList.setOnRefreshListener(new BusStopOnRefreshListener());
         CallConApiBusStop();
         Thread threadCallApi = new Thread() {
@@ -107,6 +96,10 @@ public class BusFragment extends Fragment {
 
     }//End of initInstances
 
+    ///////////////////////////////////////////////////
+    /////////////////// method ///////////////////////
+    //////////////////////////////////////////////////
+
     private void CallConApiBusStop() {
         Call<List<BusStopItemCollectionDao>> call = HttpManager.getInstance().getService().loadBusStopList(busId);
         call.enqueue(new ListCallback());
@@ -116,11 +109,38 @@ public class BusFragment extends Fragment {
         Toast.makeText(getContext(), "" + str, Toast.LENGTH_SHORT).show();
     }
 
+    ///////////////////////////////////////////////////
+    /////////////////// Listener //////////////////////
+    //////////////////////////////////////////////////
+
+    private class BusStopOnRefreshListener implements SwipeRefreshLayout.OnRefreshListener {
+        @Override
+        public void onRefresh() {
+            CallConApiBusStop();
+        }
+    }//End of BusStopOnRefreshListener
+
+
+    private class lvBusStopOnScrollListener implements AbsListView.OnScrollListener {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            swipe_BusStopList.setEnabled(firstVisibleItem == 0);
+        }
+    }
+
+    ///////////////////////////////////////////////////
+    /////////////////// inner Class //////////////////
+    //////////////////////////////////////////////////
     private class ListCallback implements Callback<List<BusStopItemCollectionDao>> {
         @Override
         public void onResponse(Call<List<BusStopItemCollectionDao>> call, Response<List<BusStopItemCollectionDao>> response) {
             if (response.isSuccessful()) {
-                
+
                 swipe_BusStopList.setRefreshing(false);
                 List<BusStopItemCollectionDao> dao = response.body();
                 busStopListAdapter.setData(dao);
@@ -139,14 +159,6 @@ public class BusFragment extends Fragment {
             showToast("ติดต่อข้อมูลไม่ได้");
         }
     }//End of ListCallback
-
-
-    private class BusStopOnRefreshListener implements SwipeRefreshLayout.OnRefreshListener {
-        @Override
-        public void onRefresh() {
-            CallConApiBusStop();
-        }
-    }//End of BusStopOnRefreshListener
 
 
 }// End of BusFragment
