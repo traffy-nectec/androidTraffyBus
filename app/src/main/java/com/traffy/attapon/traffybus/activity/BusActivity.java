@@ -1,5 +1,6 @@
 package com.traffy.attapon.traffybus.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -20,9 +21,9 @@ public class BusActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bus);
 
-        toolbar = (Toolbar) findViewById(R.id.toolBarBusStop); // Attaching the layout to the toolbar object
+ /*       toolbar = (Toolbar) findViewById(R.id.toolBarBusStop);
         setSupportActionBar(toolbar);
-        tv_busStop_name = (TextView) findViewById(R.id.tv_busStop_name);
+        tv_busStop_name = (TextView) findViewById(R.id.tv_busStop_name);*/
 
 
         if (savedInstanceState == null) {
@@ -30,7 +31,7 @@ public class BusActivity extends AppCompatActivity {
             Bundle bundle = getIntent().getExtras();
             if (bundle != null) {
                 name = bundle.getString("busId");
-                tv_busStop_name.setText(name);
+              //  tv_busStop_name.setText(name);
             }
             getSupportFragmentManager()
                     .beginTransaction()
@@ -38,4 +39,5 @@ public class BusActivity extends AppCompatActivity {
                     .commit();
         }
     }
+
 }
