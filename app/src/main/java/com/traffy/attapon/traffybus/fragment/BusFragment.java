@@ -50,7 +50,10 @@ public class BusFragment extends Fragment {
     private TextView tv_bus_route;
     private SharedPreNoTiBus sharedPreNoTiBus;
     private List<BusStopItemCollectionDao> dao;
-    private String stopid = "";
+    private final int MOD_NOTI_CANCEL = 0;
+    private final int MOD_NOTI_TIME10 = 1;
+    private final int MOD_NOTI_NEXT_TO = 2;
+    private int notificationMod = 0;
 
 
     public static BusFragment newInstance(String busId) {
@@ -96,29 +99,33 @@ public class BusFragment extends Fragment {
         swipe_BusStopList.setOnRefreshListener(new BusStopOnRefreshListener());
         lv_BusStop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 TextView tv_BusStopId = (TextView) view.findViewById(R.id.lv_bmta_id);
                 String busStopId = tv_BusStopId.getText().toString();
+                if (busStopId == null)
+                    busStopId = "";
                 final CharSequence[] items = {"แจ้งเตือนก่อนถึงป้าย 10 นาที", "แจ้งเตือนก่อนถึงหนึ่งป้าย", "ยกเลิก"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("แจ้งเตือนก่อนถึงป้าย");
                 builder.setItems(items, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int position) {
                         switch (position) {
                             case 0:
-                                showToast("" + position);
+                                notificationMod = MOD_NOTI_TIME10;
                                 break;
                             case 1:
-                                showToast(position + "");
+                                notificationMod = MOD_NOTI_NEXT_TO;
                                 break;
                             case 2:
+                                notificationMod = MOD_NOTI_CANCEL;
                                 sharedPreNoTiBus.resetSharedPreNoTiBus();
                                 busStopListAdapter.notifyDataSetChanged();
-                                stopid = "";
                                 break;
+                            default:
+                                notificationMod = MOD_NOTI_CANCEL;
+                                sharedPreNoTiBus.resetSharedPreNoTiBus();
+                                busStopListAdapter.notifyDataSetChanged();
                         }
 
                     }
@@ -126,11 +133,8 @@ public class BusFragment extends Fragment {
                 AlertDialog alert = builder.create();
                 alert.show();
 
-
-                stopid = dao.get(position).getStopId().toString();
-
-                showToast("stopid = " + stopid);
-                //sharedPreNoTiBus.resetSharedPreNoTiBus();
+                showToast("stopid = " + busStopId);
+                sharedPreNoTiBus.resetSharedPreNoTiBus();
                 sharedPreNoTiBus.setNotiBus(busStopId);
 
                 busStopListAdapter.notifyDataSetChanged();
@@ -181,32 +185,44 @@ public class BusFragment extends Fragment {
         Toast.makeText(getContext(), "" + str, Toast.LENGTH_SHORT).show();
     }
 
-    public void showNotification(String bmta_id, Integer predict_time) {
+    public void showNotification(String bmta_id, String stopName, Integer predict_time) {
+
+        Log.d("dd", "time ---" + predict_time);
+        Log.d("dd", "bmta_id ---" + bmta_id);
+        Log.d("dd-", "shared id ---" + sharedPreNoTiBus.getNotiBus());
+
+        String busStopId = sharedPreNoTiBus.getNotiBus();
+
+        if (notificationMod == MOD_NOTI_TIME10) {
+            if (busStopId.equals(bmta_id) && predict_time <= 10)
+                NotificationBus(bmta_id,stopName, predict_time);
+        } else if (notificationMod == MOD_NOTI_NEXT_TO) {
+            if (busStopId.equals(bmta_id))
+                NotificationBus(bmta_id,stopName ,predict_time);
+        } else {
+
+        }
+
+    }
+
+    private void NotificationBus(String bmta_id,String stopName, Integer predict_time) {
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         int intbmta_id = Integer.parseInt(bmta_id.replace("-", ""));
 
         Intent intent = new Intent(getContext(), BusActivity.class);
         intent.putExtra("busId", busId);
         PendingIntent pIntent = PendingIntent.getActivity(getActivity(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Log.d("dd", "time ---" + predict_time);
-        Log.d("dd", "id ---" + bmta_id);
-        Log.d("dd-", "shared id ---" + sharedPreNoTiBus.getNotiBus());
-
-
-        if (stopid.equals(bmta_id) && predict_time <= 10) {
-            stopid = "";
-            sharedPreNoTiBus.resetSharedPreNoTiBus();
-            Notification mNotification = new Notification.Builder(getContext())
-                    .setContentTitle("รถหมายเลข " + bmta_id)
-                    .setContentText("จะถึงในอีก " + predict_time + " นาที  ")
-                    .setSmallIcon(R.drawable.bus_icon)
-                    .setContentIntent(pIntent)
-                    .setSound(soundUri)
-                    .build();
-            NotificationManager notificationManager = (NotificationManager) getContext()
-                    .getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(intbmta_id, mNotification);
-        }
+        sharedPreNoTiBus.resetSharedPreNoTiBus();
+        Notification mNotification = new Notification.Builder(getContext())
+                .setContentTitle(stopName)
+                .setContentText("ถึงในอีก " + predict_time + " นาที  ")
+                .setSmallIcon(R.drawable.bus_icon)
+                .setContentIntent(pIntent)
+                .setSound(soundUri)
+                .build();
+        NotificationManager notificationManager = (NotificationManager) getContext()
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(intbmta_id, mNotification);
     }
 
     ///////////////////////////////////////////////////
@@ -248,7 +264,9 @@ public class BusFragment extends Fragment {
                 busStopListAdapter.setData(dao);
                 lv_BusStop.setAdapter(busStopListAdapter);
 
-                showNotification(dao.get(0).getStopId().toString(), dao.get(0).getPredictTime());
+                showNotification(dao.get(0).getStopId().toString()
+                        ,dao.get(0).getStopName()
+                        , dao.get(0).getPredictTime());
 
             } else {
 
