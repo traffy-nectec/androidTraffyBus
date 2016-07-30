@@ -80,7 +80,6 @@ public class BusStopListAdapter extends BaseAdapter {
             holder.lv_stop_name = (TextView) convertView.findViewById(R.id.lv_stop_name);
             holder.lv_predict_time = (TextView) convertView.findViewById(R.id.lv_predict_time);
             holder.lv_previous_stop = (TextView) convertView.findViewById(R.id.lv_previous_stop);
-            holder.lv_bmta_id = (TextView) convertView.findViewById(R.id.lv_bmta_id);
             holder.img_ic_alert = (ImageView) convertView.findViewById(R.id.img_ic_alert);
 
             convertView.setTag(holder);
@@ -92,10 +91,9 @@ public class BusStopListAdapter extends BaseAdapter {
         holder.lv_stop_name.setText(data.get(position).getStopName());
         holder.lv_predict_time.setText("" + Math.abs(data.get(position).getPredictTime()));
         holder.lv_previous_stop.setText("[" + data.get(position).getNumberOfNexts().toString() + "ป้าย]");
-        holder.lv_bmta_id.setText(data.get(position).getStopId().toString());
+
 
         if (getItemViewType(position) == 1) {
-            Log.d("list","getItemViewType");
             holder.img_ic_alert.setVisibility(View.VISIBLE);
         }else{
             holder.img_ic_alert.setVisibility(View.INVISIBLE);
@@ -111,7 +109,6 @@ public class BusStopListAdapter extends BaseAdapter {
         TextView lv_previous_stop;
         TextView lv_predict_time;
         TextView lv_stop_name;
-        TextView lv_bmta_id;
         ImageView img_ic_alert;
     }
 

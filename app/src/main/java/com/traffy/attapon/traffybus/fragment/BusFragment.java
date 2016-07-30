@@ -1,6 +1,5 @@
 package com.traffy.attapon.traffybus.fragment;
 
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -15,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.traffy.attapon.traffybus.DAO.BusStopItemCollectionDao;
 import com.traffy.attapon.traffybus.R;
 import com.traffy.attapon.traffybus.activity.BusActivity;
+import com.traffy.attapon.traffybus.activity.MainActivity;
 import com.traffy.attapon.traffybus.adapter.BusStopListAdapter;
 import com.traffy.attapon.traffybus.manager.HttpManager;
 import com.traffy.attapon.traffybus.util.SharedPreNoTiBus;
@@ -39,7 +40,6 @@ import retrofit2.Response;
 
 
 public class BusFragment extends Fragment {
-
 
     private String busId;
     private ListView lv_BusStop;
@@ -71,6 +71,13 @@ public class BusFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mPressBack();
+    }
+
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -87,7 +94,6 @@ public class BusFragment extends Fragment {
 
         lv_BusStop.setAdapter(busStopListAdapter);
 
-
         initInstances(rootView);
 
         return rootView;
@@ -97,51 +103,7 @@ public class BusFragment extends Fragment {
         CallConApiBusStop();
         lv_BusStop.setOnScrollListener(new lvBusStopOnScrollListener());
         swipe_BusStopList.setOnRefreshListener(new BusStopOnRefreshListener());
-        lv_BusStop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView tv_BusStopId = (TextView) view.findViewById(R.id.lv_bmta_id);
-                String busStopId = tv_BusStopId.getText().toString();
-                if (busStopId == null)
-                    busStopId = "";
-                final CharSequence[] items = {"แจ้งเตือนก่อนถึงป้าย 10 นาที", "แจ้งเตือนก่อนถึงหนึ่งป้าย", "ยกเลิก"};
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setItems(items, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int position) {
-                        switch (position) {
-                            case 0:
-                                notificationMod = MOD_NOTI_TIME10;
-                                break;
-                            case 1:
-                                notificationMod = MOD_NOTI_NEXT_TO;
-                                break;
-                            case 2:
-                                notificationMod = MOD_NOTI_CANCEL;
-                                sharedPreNoTiBus.resetSharedPreNoTiBus();
-                                busStopListAdapter.notifyDataSetChanged();
-                                break;
-                            default:
-                                notificationMod = MOD_NOTI_CANCEL;
-                                sharedPreNoTiBus.resetSharedPreNoTiBus();
-                                busStopListAdapter.notifyDataSetChanged();
-                        }
-
-                    }
-                });
-                AlertDialog alert = builder.create();
-                alert.show();
-
-                showToast("stopid = " + busStopId);
-                sharedPreNoTiBus.resetSharedPreNoTiBus();
-                sharedPreNoTiBus.setNotiBus(busStopId);
-
-                busStopListAdapter.notifyDataSetChanged();
-                //lv_BusStop.setAdapter(busStopListAdapter);
-
-            }
-        });
+        lv_BusStop.setOnItemClickListener(new ListViewOnItemClickListener());
 
         Thread threadCallApi = new Thread() {
             @Override
@@ -179,11 +141,11 @@ public class BusFragment extends Fragment {
     private void CallConApiBusStop() {
         Call<List<BusStopItemCollectionDao>> call = HttpManager.getInstance().getService().loadBusStopList(busId);
         call.enqueue(new ListCallback());
-    }
+    }//End of CallConApiBusStop
 
     private void showToast(String str) {
         Toast.makeText(getContext(), "" + str, Toast.LENGTH_SHORT).show();
-    }
+    }//End of showToast
 
     public void showNotification(String bmta_id, String stopName, Integer predict_time) {
 
@@ -195,19 +157,19 @@ public class BusFragment extends Fragment {
 
         if (notificationMod == MOD_NOTI_TIME10) {
             if (busStopId.equals(bmta_id) && predict_time <= 10)
-                NotificationBus(bmta_id,stopName, predict_time);
+                NotificationBus(bmta_id, stopName, predict_time);
         } else if (notificationMod == MOD_NOTI_NEXT_TO) {
             if (busStopId.equals(bmta_id))
-                NotificationBus(bmta_id,stopName ,predict_time);
+                NotificationBus(bmta_id, stopName, predict_time);
         } else {
-
+            //When click Cancel
         }
 
-    }
+    }//End of showNotification
 
-    private void NotificationBus(String bmta_id,String stopName, Integer predict_time) {
+    private void NotificationBus(String bmta_id, String stopName, Integer predict_time) {
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        int intbmta_id = Integer.parseInt(bmta_id.replace("-", ""));
+        int intbmta_id = Integer.parseInt(bmta_id);
 
         Intent intent = new Intent(getContext(), BusActivity.class);
         intent.putExtra("busId", busId);
@@ -223,7 +185,26 @@ public class BusFragment extends Fragment {
         NotificationManager notificationManager = (NotificationManager) getContext()
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(intbmta_id, mNotification);
-    }
+    }//End of NotificationBus
+
+    private void mPressBack() {
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP
+                        && keyCode == KeyEvent.KEYCODE_BACK) {
+
+                    Intent intent = new Intent(getContext(), MainActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+                return false;
+            }
+        });
+    }//End of mPressBack
+
 
     ///////////////////////////////////////////////////
     /////////////////// Listener //////////////////////
@@ -236,7 +217,6 @@ public class BusFragment extends Fragment {
         }
     }//End of BusStopOnRefreshListener
 
-
     private class lvBusStopOnScrollListener implements AbsListView.OnScrollListener {
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -247,7 +227,48 @@ public class BusFragment extends Fragment {
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             swipe_BusStopList.setEnabled(firstVisibleItem == 0);
         }
-    }
+    }//End of BusStopOnRefreshListener
+
+    private class ListViewOnItemClickListener implements AdapterView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            String busStopId = dao.get(position).getStopId().toString();
+
+            if (busStopId == null)
+                busStopId = "";
+            final CharSequence[] items = {"แจ้งเตือนก่อนถึงป้าย 10 นาที", "แจ้งเตือนก่อนถึงหนึ่งป้าย", "ยกเลิก"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setItems(items, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int position) {
+                    switch (position) {
+                        case 0:
+                            notificationMod = MOD_NOTI_TIME10;
+                            break;
+                        case 1:
+                            notificationMod = MOD_NOTI_NEXT_TO;
+                            break;
+                        case 2:
+                            notificationMod = MOD_NOTI_CANCEL;
+                            sharedPreNoTiBus.resetSharedPreNoTiBus();
+                            busStopListAdapter.notifyDataSetChanged();
+                            break;
+                        default:
+                            notificationMod = MOD_NOTI_CANCEL;
+                            sharedPreNoTiBus.resetSharedPreNoTiBus();
+                            busStopListAdapter.notifyDataSetChanged();
+                    }
+
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+            sharedPreNoTiBus.resetSharedPreNoTiBus();
+            sharedPreNoTiBus.setNotiBus(busStopId);
+            busStopListAdapter.notifyDataSetChanged();
+        }
+    }//End of ListViewOnItemClickListener
 
     ///////////////////////////////////////////////////
     /////////////////// inner Class //////////////////
@@ -265,7 +286,7 @@ public class BusFragment extends Fragment {
                 lv_BusStop.setAdapter(busStopListAdapter);
 
                 showNotification(dao.get(0).getStopId().toString()
-                        ,dao.get(0).getStopName()
+                        , dao.get(0).getStopName()
                         , dao.get(0).getPredictTime());
 
             } else {

@@ -349,7 +349,7 @@ public class SimpleFragment extends Fragment {
             jsonToBuslist(jsonTxt);
 
             if (outOfService) {
-                showToast("คุณไม่อยู่ในเขตบริการของสาย 73ก");
+                //showToast("คุณไม่อยู่ในเขตบริการของสาย 73ก");
                 outOfService = false;
             }
 

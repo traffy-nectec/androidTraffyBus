@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +32,7 @@ import com.traffy.attapon.traffybus.util.MyDbHelper;
 import com.traffy.attapon.traffybus.R;
 import com.traffy.attapon.traffybus.util.SharedPre;
 import com.traffy.attapon.traffybus.adapter.SimplePagerAdapter;
+import com.traffy.attapon.traffybus.util.SharedPreNoTiBus;
 
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks
@@ -50,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private LocationAvailability locationAvailability;
     private static final int REQUEST_LOCATION = 0;
     private LocationRequest locationRequest;
+    private SharedPreNoTiBus sharedPreNoTiBus;
+    boolean doubleBackToExitPressedOnce = false;
 
 
     @Override
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mDb = mHelper.getWritableDatabase();
 
         sharedPre = new SharedPre(getApplication());
+        sharedPreNoTiBus = new SharedPreNoTiBus(getApplication());
         sharedPre.setPage(0);
 
 
@@ -133,14 +138,34 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            finish();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "กดสองครั้งเพื่อปิดแอพพลิเคชั่น", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
+    }
+
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         Log.d("dd", "onDestroy");
         sharedPre.reSetSharedPreAlertNoti();
         sharedPre.reSetSharedPre();
-        super.onDestroy();
-
+        sharedPreNoTiBus.resetSharedPreNoTiBus();
     }
 
     @Override
