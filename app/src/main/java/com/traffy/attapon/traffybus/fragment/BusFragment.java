@@ -125,12 +125,9 @@ public class BusFragment extends Fragment {
                 } catch (InterruptedException e) {
                 }
             }
-
-
         };
 
         threadCallApi.start();
-
 
     }//End of initInstances
 
@@ -148,10 +145,6 @@ public class BusFragment extends Fragment {
     }//End of showToast
 
     public void showNotification(String bmta_id, String stopName, Integer predict_time) {
-
-        Log.d("dd", "time ---" + predict_time);
-        Log.d("dd", "bmta_id ---" + bmta_id);
-        Log.d("dd-", "shared id ---" + sharedPreNoTiBus.getNotiBus());
 
         String busStopId = sharedPreNoTiBus.getNotiBus();
 

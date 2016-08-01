@@ -31,7 +31,6 @@ public class BusActivity extends AppCompatActivity {
                     .add(R.id.bus_ContentContainer, BusFragment.newInstance(name))
                     .commit();
         }
-
     }
 
 }
