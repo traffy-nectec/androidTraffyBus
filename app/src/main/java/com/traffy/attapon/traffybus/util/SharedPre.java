@@ -17,6 +17,7 @@ public class SharedPre {
     static String perfsName2 = "UserHelper";
 
 
+
     public SharedPre(Context context) {
         this.context = context;
 
@@ -30,8 +31,6 @@ public class SharedPre {
         }
 
     }
-
-
     public int getPage() {
 
             return sharedPerfs.getInt("page", 0);

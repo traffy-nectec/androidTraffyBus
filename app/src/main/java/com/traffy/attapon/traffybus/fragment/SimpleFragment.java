@@ -9,6 +9,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -20,6 +21,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.Gravity;
@@ -133,6 +135,7 @@ public class SimpleFragment extends Fragment {
         position = bundle.getInt(SimplePagerAdapter.ARGS_POSITION);
 
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.activity_main, container, false);
+
 
         lvHeader = (ListView) rootView.findViewById(R.id.lv_header);
         lvBuslist = (ListView) rootView.findViewById(R.id.lv_BusList);
@@ -346,7 +349,7 @@ public class SimpleFragment extends Fragment {
             jsonToBuslist(jsonTxt);
 
             if (outOfService) {
-                showToast("คุณไม่อยู่ในเขตบริการของสาย 73ก");
+                //showToast("คุณไม่อยู่ในเขตบริการของสาย 73ก");
                 outOfService = false;
             }
 
@@ -657,7 +660,7 @@ public class SimpleFragment extends Fragment {
             String busId = textView.getText().toString();
             Toast.makeText(getActivity(), busId + "-- " + position + "", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getActivity(), BusActivity.class);
-            intent.putExtra("busId",busId);
+            intent.putExtra("busId", busId);
             startActivity(intent);
 
         }
