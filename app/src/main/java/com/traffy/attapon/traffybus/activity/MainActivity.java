@@ -11,12 +11,15 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -54,6 +57,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import com.traffy.attapon.traffybus.adapter.Bus;
 import com.traffy.attapon.traffybus.adapter.routAdapter;
 import com.traffy.attapon.traffybus.util.SendUserInfo;
@@ -76,49 +80,84 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private LocationRequest locationRequest;
     public static boolean sendInfo = true;
     private long referenceTime = 0;
-    private String lat,lng;
+    private String lat, lng;
     private int sleepTime = 10000;
     Thread t;
     String fakelat = "13.782711";
-    String fakelng ="100.615303";
+    String fakelng = "100.615303";
     private SensorManager manager;
     private Sensor accelerometer;
     Accelerometer accel;
     ArrayList<String> buffer;
     ArrayList<String> accelList;
     private int interval = 1000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_list);
 
-        buffer=  new ArrayList<>();
-        accelList = new ArrayList<>();
 
-        traffyLogo = (ImageView)findViewById(R.id.logo);
+       initInstance();
 
-        refresh = (SwipeRefreshLayout)findViewById(R.id.activity_main_swipe_refresh_layout);////refresh bar
+
+
+}
+
+    private void initInstance() {
+        refresh = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);////refresh bar
         refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 fakelat = "13.804464";
                 fakelng = "100.576620";
-                addBus();
+                initInstance();
             }
         });
+
+        if (isOnline()) {
+            callFunction();
+        } else {
+            AlertDialog.Builder builder =
+                    new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage("คุณไม่ได้เปิดอินเทอร์เน็ต?");
+            builder.setPositiveButton("เปิด", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    startActivity(new Intent(Settings.ACTION_SETTINGS));
+                    refresh.setRefreshing(false);
+                }
+            });
+            builder.setNegativeButton("ปิด", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    refresh.setRefreshing(false);
+
+                }
+            });
+            builder.show();
+        }
+    }
+
+    private void callFunction() {
+        buffer = new ArrayList<>();
+        accelList = new ArrayList<>();
+
+        traffyLogo = (ImageView) findViewById(R.id.logo);
+
+
         ////////////////////////initialize accel
-        manager = (SensorManager)getSystemService(this.SENSOR_SERVICE);
+        manager = (SensorManager) getSystemService(this.SENSOR_SERVICE);
         accelerometer = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         accel = new Accelerometer();
-        manager.registerListener(accel,accelerometer,SensorManager.SENSOR_DELAY_NORMAL);
+        manager.registerListener(accel, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
 
         t = new Thread(new Runnable() {//sendInfo Thread
             @Override
             public void run() {
                 int i = 10;
-                while(true) {
-                    if(i==10) {
+                while (true) {
+                    if (i == 10) {
                         Log.d("TimeReference", String.valueOf(System.currentTimeMillis() - referenceTime));
                         referenceTime = System.currentTimeMillis();
                         Log.d("Execute", "sending user info");
@@ -146,29 +185,29 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mHelper = new MyDbHelper(this);
         mDb = mHelper.getWritableDatabase();
 
-        route = (ListView)findViewById(R.id.route);
-        addBus();///add bus from JSON
-       // refresh.setRefreshi ng(true);
-        List<Bus> Buslist= new ArrayList<Bus>();
+        route = (ListView) findViewById(R.id.route);
 
-        ListAdapter adapter = new routAdapter(this,Buslist);
+        addBus();///add bus from JSON.tr
+        // refresh.setRefreshi ng(true);
+        List<Bus> Buslist = new ArrayList<Bus>();
+
+        ListAdapter adapter = new routAdapter(this, Buslist);
 
         route.setAdapter(adapter);
 
         route.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(MainActivity.this,MainActivityOld.class);
-                Bus bus = (Bus)parent.getItemAtPosition(position);
+                Intent intent = new Intent(MainActivity.this, MainActivityOld.class);
+                Bus bus = (Bus) parent.getItemAtPosition(position);
 
-                intent.putExtra("bus_line",bus.getLine());
+                intent.putExtra("bus_line", bus.getLine());
                 startActivity(intent);
             }
         });
-
     }
 
-    private  void buildGoogleApiClient() {
+    private void buildGoogleApiClient() {
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
@@ -181,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onStart();
 
         //sendInfo = true;
-        Log.d("position","onResume");
+        Log.d("position", "onResume");
     }
 
     @Override
@@ -194,6 +233,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         //   sendInfo = false;
 
     }
+
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         getLocationConnect();
@@ -219,8 +259,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         Log.d("Location", "lat=" + lat + " lng " + lng);
         locaText = "lat=" + lat + "&lng=" + lng;
-        if(t.getState()== Thread.State.NEW)
-        {
+        if (t.getState() == Thread.State.NEW) {
             t.start();
         }
 
@@ -294,8 +333,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         }
     }
-    public void SendUserInfo()
-    {
+
+    public void SendUserInfo() {
         String dateTime, MacAddress;
 
         WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);//get MacAddress
@@ -307,18 +346,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         dateTime = format.format(currentDateTime);//convert login date and time to String
 
         //Execute POST
-        SendUserInfo user = new SendUserInfo(dateTime, MacAddress,lat,lng,this,buffer);
+        SendUserInfo user = new SendUserInfo(dateTime, MacAddress, lat, lng, this, buffer);
         user.execute("http://cloud.traffy.in.th/attapon/API/get_location/get_user_location.php");
 
     }
-    private void addBus()
-    {
+
+    private void addBus() {
+
         getBusJSon getBus = new getBusJSon();
         //get Bus line from station lat lng
-       // getBus.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_bus_line_on_service.php?lat="+fakelat+"&lng="+fakelng+"&radius=500");
-       getBus.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_bus_line_on_service.php?lat="+fakelat+"&lng="+fakelng+"&radius=100000");
+        // getBus.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_bus_line_on_service.php?lat="+fakelat+"&lng="+fakelng+"&radius=500");
+        getBus.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_bus_line_on_service.php?lat=" + fakelat + "&lng=" + fakelng + "&radius=100000");
 
     }
+
     public void openURLS(View view) {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
@@ -326,70 +367,76 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         intent.setData(Uri.parse("https://docs.google.com/forms/d/17UmjxZR-ZORNFjCxAGGLfbInpfG-EfpoehYZomOVY6w/viewform"));
         startActivity(intent);
     }
-    private class getBusJSon extends AsyncTask<String, Void, String> {
 
-        List<Bus> bus;
+private class getBusJSon extends AsyncTask<String, Void, String> {
 
-        HttpURLConnection connection;
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                Log.d("Updateing...","start update");
-                bus = new ArrayList<Bus>();
-                URL u = new URL(params[0]);
-                connection = (HttpURLConnection) u.openConnection();
-                connection.getDoInput();
-                StringBuffer buff = new StringBuffer();
-                String JSontxt = "";
-                connection.connect();
-                int responseCode = connection.getResponseCode();//connect to web
-                if(responseCode==200) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    while ((JSontxt = reader.readLine()) != null) {
-                        buff.append(JSontxt);
-                    }
-                    reader.close();
+    List<Bus> bus;
+
+    HttpURLConnection connection;
+
+    @Override
+    protected String doInBackground(String... params) {
+        try {
+            Log.d("Updateing...", "start update");
+            bus = new ArrayList<Bus>();
+            URL u = new URL(params[0]);
+            connection = (HttpURLConnection) u.openConnection();
+            connection.getDoInput();
+            StringBuffer buff = new StringBuffer();
+            String JSontxt = "";
+            connection.connect();
+            int responseCode = connection.getResponseCode();//connect to web
+            if (responseCode == 200) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while ((JSontxt = reader.readLine()) != null) {
+                    buff.append(JSontxt);
                 }
-                JSONArray JArray = new JSONArray(buff.toString());
-                Log.d("JSONCheck",JArray.toString());
-                for(int i = 0 ; i < JArray.length();i++)///get JSON data
-                {
-                    JSONObject JObject = JArray.getJSONObject(i);
-                    String Bus_Line = JObject.getString("bus_line");
-                    String Bus_Name = JObject.getString("bus_name");
-                    String start = JObject.getString("start");
-                    String end = JObject.getString("end");
-                    bus.add(new Bus(Bus_Name,Bus_Line,start,end));
-                }
-                final  ListAdapter adapter = new routAdapter(MainActivity.this,bus);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        route.setAdapter(adapter);
-                        if(refresh.isRefreshing())//stop refreshing animtion
-                        {
-                            refresh.setRefreshing(false);
-                            Toast.makeText(MainActivity.this, "อัพเดทแล้ว", Toast.LENGTH_SHORT).show();
-                        }
-
+                reader.close();
+            }
+            JSONArray JArray = new JSONArray(buff.toString());
+            Log.d("JSONCheck", JArray.toString());
+            for (int i = 0; i < JArray.length(); i++)///get JSON data
+            {
+                JSONObject JObject = JArray.getJSONObject(i);
+                String Bus_Line = JObject.getString("bus_line");
+                String Bus_Name = JObject.getString("bus_name");
+                String start = JObject.getString("start");
+                String end = JObject.getString("end");
+                bus.add(new Bus(Bus_Name, Bus_Line, start, end));
+            }
+            final ListAdapter adapter = new routAdapter(MainActivity.this, bus);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    route.setAdapter(adapter);
+                    if (refresh.isRefreshing())//stop refreshing animtion
+                    {
+                        refresh.setRefreshing(false);
+                        Toast.makeText(MainActivity.this, "อัพเดทแล้ว", Toast.LENGTH_SHORT).show();
                     }
-                });
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                Toast.makeText(getBaseContext(),"ติดต่อระบบไม่ได้",Toast.LENGTH_SHORT);
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            finally {
-                connection.disconnect();
-                Log.d("Updateing...","finish update");
-            }
-            return null;
+
+                }
+            });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            Toast.makeText(getBaseContext(), "ติดต่อระบบไม่ได้", Toast.LENGTH_SHORT);
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            connection.disconnect();
+            Log.d("Updateing...", "finish update");
         }
-
+        return null;
     }
 
+}
 
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
 }

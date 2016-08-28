@@ -18,15 +18,15 @@
         android:orientation="vertical"
         tools:context="{relativePackage}.${activityClass}">
 
-        <android.support.v7.widget.SwitchCompat
-            android:id="@+id/swt_noti"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:checked="false"
-            android:paddingLeft="10dp"
-            android:text="เปิดการแจ้งเตือน"
-            android:textColor="#fff" />
+        <!--<android.support.v7.widget.SwitchCompat-->
+            <!--android:id="@+id/swt_noti"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@color/colorPrimary"-->
+            <!--android:checked="false"-->
+            <!--android:paddingLeft="10dp"-->
+            <!--android:text="เปิดการแจ้งเตือน"-->
+            <!--android:textColor="#fff" />-->
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -45,8 +45,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
                     android:layout_gravity="left"
-
-                    android:src="@drawable/bus_icon"
+                    android:src="@drawable/ic_directions_bus"
                     android:id="@+id/imageView"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentRight="true"

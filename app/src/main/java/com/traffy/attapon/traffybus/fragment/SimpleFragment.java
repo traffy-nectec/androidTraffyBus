@@ -470,9 +470,9 @@ public class SimpleFragment extends Fragment {
                     if (position == sharedPre.getPage() && sharedPre.getNoti()) {
 
                         //   Log.d("position ------", "" + sharedPre.getAlertNoti(c.getString("bmta_id")));
-
+                        int prdTime = Integer.parseInt(c.getString("predict_time"));
                         if (sharedPre.getAlertNoti(c.getString("bmta_id")) == null
-                                && Integer.parseInt(c.getString("predict_time")) <= 10) {
+                                && ((prdTime >= 0) && (prdTime <= 10))) {
 
                             sharedPre.setAlertNoti(c.getString("bmta_id"));
                             Log.d("position", "" + position + " " + c.getString("bmta_id"));
@@ -642,6 +642,7 @@ public class SimpleFragment extends Fragment {
                 .setSmallIcon(R.drawable.bus_icon)
                 .setContentIntent(pIntent)
                 .setSound(soundUri)
+                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
                 .build();
         NotificationManager notificationManager = (NotificationManager) getActivity()
                 .getSystemService(Context.NOTIFICATION_SERVICE);
@@ -656,7 +657,7 @@ public class SimpleFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             TextView textView = (TextView) view.findViewById(R.id.lv_bmta_id);
             String busId = textView.getText().toString();
-            Toast.makeText(getActivity(), busId + "-- " + position + "", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),"คุณขึ้นรถหมายเลข "+ busId , Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getActivity(), BusActivity.class);
             intent.putExtra("busId", busId);
             startActivity(intent);

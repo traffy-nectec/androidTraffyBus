@@ -148,7 +148,7 @@ public class BusFragment extends Fragment {
         String busStopId = sharedPreNoTiBus.getNotiBus();
 
         if (notificationMod == MOD_NOTI_TIME10) {
-            if (busStopId.equals(bmta_id) && predict_time <= 10)
+            if (busStopId.equals(bmta_id) && ((predict_time >= 0)&&(predict_time <= 10)))
                 NotificationBus(bmta_id, stopName, predict_time);
         } else if (notificationMod == MOD_NOTI_NEXT_TO) {
             if (busStopId.equals(bmta_id))
@@ -173,6 +173,7 @@ public class BusFragment extends Fragment {
                 .setSmallIcon(R.drawable.bus_icon)
                 .setContentIntent(pIntent)
                 .setSound(soundUri)
+                .setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
                 .build();
         NotificationManager notificationManager = (NotificationManager) getContext()
                 .getSystemService(Context.NOTIFICATION_SERVICE);
