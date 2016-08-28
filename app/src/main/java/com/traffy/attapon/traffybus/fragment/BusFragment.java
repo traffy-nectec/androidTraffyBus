@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +26,7 @@ import android.widget.Toast;
 import com.traffy.attapon.traffybus.DAO.BusStopItemCollectionDao;
 import com.traffy.attapon.traffybus.R;
 import com.traffy.attapon.traffybus.activity.BusActivity;
-import com.traffy.attapon.traffybus.activity.MainActivity;
+import com.traffy.attapon.traffybus.activity.MainActivityOld;
 import com.traffy.attapon.traffybus.adapter.BusStopListAdapter;
 import com.traffy.attapon.traffybus.manager.HttpManager;
 import com.traffy.attapon.traffybus.util.SharedPreNoTiBus;
@@ -73,7 +72,7 @@ public class BusFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mPressBack();
+     //   mPressBack();
     }
 
 
@@ -180,23 +179,23 @@ public class BusFragment extends Fragment {
         notificationManager.notify(intbmta_id, mNotification);
     }//End of NotificationBus
 
-    private void mPressBack() {
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_UP
-                        && keyCode == KeyEvent.KEYCODE_BACK) {
-
-                    Intent intent = new Intent(getContext(), MainActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                return false;
-            }
-        });
-    }//End of mPressBack
+//    private void mPressBack() {
+//        getView().setFocusableInTouchMode(true);
+//        getView().requestFocus();
+//        getView().setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (event.getAction() == KeyEvent.ACTION_UP
+//                        && keyCode == KeyEvent.KEYCODE_BACK) {
+//
+//                    Intent intent = new Intent(getContext(), MainActivityOld.class);
+//                    startActivity(intent);
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
+//    }//End of mPressBack
 
 
     ///////////////////////////////////////////////////

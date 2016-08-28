@@ -1,0 +1,270 @@
+package com.traffy.attapon.traffybus.activity;
+
+
+import android.Manifest;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
+import android.widget.Toast;
+
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.traffy.attapon.traffybus.util.MyDbHelper;
+import com.traffy.attapon.traffybus.R;
+import com.traffy.attapon.traffybus.util.SharedPre;
+import com.traffy.attapon.traffybus.adapter.SimplePagerAdapter;
+import com.traffy.attapon.traffybus.util.SharedPreNoTiBus;
+
+
+public class MainActivityOld extends AppCompatActivity {
+
+    ///////////// Database ////////////////////
+    SQLiteDatabase mDb;
+    MyDbHelper mHelper;
+
+    private ViewPager viewPager;
+    private String bus_line;
+    //////////// get gps //////////////
+    private String locaText = null;
+    private SharedPre sharedPre;
+    private SwitchCompat swt_noti;
+    private GoogleApiClient googleApiClient;
+    private LocationAvailability locationAvailability;
+    private static final int REQUEST_LOCATION = 0;
+    private LocationRequest locationRequest;
+    private SharedPreNoTiBus sharedPreNoTiBus;
+    boolean doubleBackToExitPressedOnce = false;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_viewpager);
+        if(getIntent()!=null) {
+            bus_line = getIntent().getStringExtra("bus_line");
+        }
+
+        //buildGoogleApiClient();
+
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        swt_noti = (SwitchCompat) findViewById(R.id.swt_noti);
+
+
+        mHelper = new MyDbHelper(this);
+        mDb = mHelper.getWritableDatabase();
+
+        sharedPre = new SharedPre(getApplication());
+        sharedPreNoTiBus = new SharedPreNoTiBus(getApplication());
+        sharedPre.setPage(0);
+
+
+        PagerAdapter adapter = new SimplePagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+                switch (position) {
+                    case 0:
+                        sharedPre.setPage(0);
+                        break;
+                    case 1:
+                        sharedPre.setPage(1);
+                        break;
+                    default:
+                        sharedPre.setPage(0);
+                }
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+
+    }
+
+   /* private  void buildGoogleApiClient() {
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+    }
+*/
+    public String txtGPS() {
+        return MainActivity.locaText;
+    }
+
+  /*  @Override
+    protected void onStart() {
+        super.onStart();
+        googleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
+        Log.d("position", "onStop");
+
+    }
+*/
+//    @Override
+//    public void onBackPressed() {
+//        if (doubleBackToExitPressedOnce) {
+//            super.onBackPressed();
+//              finish();
+//            return;
+//        }
+//
+//        this.doubleBackToExitPressedOnce = true;
+//        Toast.makeText(this, "กดสองครั้งเพื่อปิดแอพพลิเคชั่น", Toast.LENGTH_SHORT).show();
+//
+//        new Handler().postDelayed(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                doubleBackToExitPressedOnce=false;
+//            }
+//        }, 2000);
+//    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("dd", "onDestroy");
+        sharedPre.reSetSharedPreAlertNoti();
+        sharedPre.reSetSharedPre();
+        sharedPreNoTiBus.resetSharedPreNoTiBus();
+    }
+
+  /*  @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        getLocationConnect();
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+        String lat = String.valueOf(location.getLatitude());
+        String lng = String.valueOf(location.getLongitude());
+
+
+        // Log.d("Location", "lat=" + lat + " lng " + lng);
+        locaText = "lat=" + lat + "&lng=" + lng;
+
+
+    }
+
+    private void getLocationConnect() {
+        //check runtime permission
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= 23) {
+                if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    showMessageOKCancel("อนุญาตให้ App Traffy Bus เข้าถึงตำแหน่งปัจจุบันของคุณ",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (Build.VERSION.SDK_INT >= 23) {
+                                        requestPermissions(new
+                                                        String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                                REQUEST_LOCATION);
+                                    }
+                                }
+                            });
+                    return;
+                }
+            }
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION);
+        } else {
+            locationAvailability =
+                    LocationServices.FusedLocationApi.getLocationAvailability(googleApiClient);
+
+            locationRequest = new LocationRequest()
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                    .setInterval(5000);
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient,
+                    locationRequest, this);
+
+            if (Build.VERSION.SDK_INT >= 23) {
+                if (!locationAvailability.isLocationAvailable()) {
+                    Toast.makeText(MainActivityOld.this, "คุณไม่ได้เปิด GPS", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                LocationManager manager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    Toast.makeText(MainActivityOld.this, "คุณไม่ได้เปิด GPS", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        }
+    }*/
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener
+            onClickListener) {
+        new AlertDialog.Builder(MainActivityOld.this)
+                .setMessage(message)
+                .setPositiveButton("ตกลง", onClickListener)
+                .setNegativeButton("ยกเลิก", null)
+                .create()
+                .show();
+    }
+
+    /*public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_LOCATION) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getLocationConnect();
+            } else {
+                // Permission was denied or request was cancelled
+            }
+        }
+    }*/
+}

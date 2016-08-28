@@ -9,7 +9,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -21,7 +20,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.Gravity;
@@ -43,7 +41,7 @@ import com.traffy.attapon.traffybus.util.ConnectionDetector;
 import com.traffy.attapon.traffybus.util.MyDbHelper;
 import com.traffy.attapon.traffybus.R;
 import com.traffy.attapon.traffybus.util.SharedPre;
-import com.traffy.attapon.traffybus.activity.MainActivity;
+import com.traffy.attapon.traffybus.activity.MainActivityOld;
 import com.traffy.attapon.traffybus.adapter.SimplePagerAdapter;
 
 import org.apache.http.HttpResponse;
@@ -570,7 +568,7 @@ public class SimpleFragment extends Fragment {
 
     private void findGpsAndShowData() {
         isInternetPresent = cd.isConnectingToInternet();
-        MainActivity mainAT = (MainActivity) getActivity();
+        MainActivityOld mainAT = (MainActivityOld) getActivity();
         locaText = mainAT.txtGPS();
         //    showToastShort(locaText);
 
@@ -633,7 +631,7 @@ public class SimpleFragment extends Fragment {
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         int intbmta_id = Integer.parseInt(bmta_id.replace("-", ""));
 
-        Intent intent = new Intent(getActivity(), MainActivity.class);
+        Intent intent = new Intent(getActivity(), MainActivityOld.class);
         intent.putExtra("pageIntent", 0);
         PendingIntent pIntent = PendingIntent.getActivity(getActivity(), 0, intent, 0);
 
