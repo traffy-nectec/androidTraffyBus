@@ -238,7 +238,7 @@ public class BusFragment extends Fragment {
 
             if (busStopId == null)
                 busStopId = "";
-            final CharSequence[] items = {"เตือนก่อนรถถึงป้าย 10 นาที", "เตือนล่วงหน้า 2 ป้าย", "ยกเลิก"};
+            final CharSequence[] items = {"เตือนก่อนรถถึงป้าย 10 นาที", "เตือนล่วงหน้า 2 ป้าย"};
 
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
 
@@ -258,22 +258,27 @@ public class BusFragment extends Fragment {
                                     notificationMod = MOD_NOTI_NEXT_TO;
                                     sharedPreNoTiBus.setTypeNotiBus(1);
                                     break;
-                                case 2:
-                                    notificationMod = MOD_NOTI_CANCEL;
-                                    sharedPreNoTiBus.resetSharedPreNoTiBus();
-                                    busStopListAdapter.notifyDataSetChanged();
-                                    sharedPreNoTiBus.setTypeNotiBus(-1);
-                                    break;
+
                                 default:
                                     notificationMod = MOD_NOTI_CANCEL;
                                     sharedPreNoTiBus.resetSharedPreNoTiBus();
                                     busStopListAdapter.notifyDataSetChanged();
+                                    sharedPreNoTiBus.setTypeNotiBus(-1);
                             }
 
 
                             dialog.dismiss();
                         }
                     });
+            alertDialogBuilder.setNeutralButton("CANCEL", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    notificationMod = MOD_NOTI_CANCEL;
+                    sharedPreNoTiBus.resetSharedPreNoTiBus();
+                    busStopListAdapter.notifyDataSetChanged();
+                    sharedPreNoTiBus.setTypeNotiBus(-1);
+                }
+            });
             alertDialogBuilder.show();
 
 //            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
