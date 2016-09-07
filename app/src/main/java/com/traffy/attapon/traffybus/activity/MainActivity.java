@@ -2,6 +2,7 @@ package com.traffy.attapon.traffybus.activity;
 
 
 import android.Manifest;
+import android.animation.AnimatorSet;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,6 +35,9 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.ndk.CrashlyticsNdk;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationAvailability;
@@ -41,7 +45,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.traffy.attapon.traffybus.R;
-import com.traffy.attapon.traffybus.util.MyDbHelper;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,7 +64,11 @@ import java.util.List;
 
 import com.traffy.attapon.traffybus.adapter.Bus;
 import com.traffy.attapon.traffybus.adapter.routAdapter;
+import com.traffy.attapon.traffybus.util.MyDbHelper;
 import com.traffy.attapon.traffybus.util.SendUserInfo;
+import com.traffy.attapon.traffybus.util.SharedPre;
+
+import io.fabric.sdk.android.Fabric;
 
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks
@@ -92,12 +100,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     ArrayList<String> accelList;
     private int interval = 1000;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_list);
-
-
+        Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
+        SharedPre sharedPre = new SharedPre(this);
+        sharedPre.setPage(0);
        initInstance();
 
 

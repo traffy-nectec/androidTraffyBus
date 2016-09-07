@@ -13,7 +13,8 @@
             android:id="@+id/toolBarBusStop"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:background="?attr/colorPrimary"
+            android:padding="4dp"
+            android:background="@color/colorPrimaryBus"
             android:popupTheme="@style/Theme.AppCompat.Light"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 

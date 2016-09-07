@@ -8,9 +8,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.KeyEvent;
@@ -72,7 +74,7 @@ public class BusFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-     //   mPressBack();
+        //   mPressBack();
     }
 
 
@@ -93,6 +95,12 @@ public class BusFragment extends Fragment {
 
         lv_BusStop.setAdapter(busStopListAdapter);
 
+        if (Build.VERSION.SDK_INT >= 21) {
+            getActivity().getWindow().setNavigationBarColor(ContextCompat.getColor(getContext()
+                    , R.color.colorNaviBarBus));
+            getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getContext()
+                    , R.color.colorPrimaryDarkBus));
+        }
         initInstances(rootView);
 
         return rootView;
@@ -143,16 +151,16 @@ public class BusFragment extends Fragment {
         Toast.makeText(getContext(), "" + str, Toast.LENGTH_SHORT).show();
     }//End of showToast
 
-    public void showNotification(String bmta_id, String stopName, Integer predict_time) {
+    public void showNotification(String bmta_id, String bmta_id_second, String stopName, Integer predict_time) {
 
         String busStopId = sharedPreNoTiBus.getNotiBus();
 
         if (notificationMod == MOD_NOTI_TIME10) {
-            if (busStopId.equals(bmta_id) && ((predict_time >= 0)&&(predict_time <= 10)))
+            if (busStopId.equals(bmta_id) && ((predict_time >= 0) && (predict_time <= 10)))
                 NotificationBus(bmta_id, stopName, predict_time);
         } else if (notificationMod == MOD_NOTI_NEXT_TO) {
-            if (busStopId.equals(bmta_id))
-                NotificationBus(bmta_id, stopName, predict_time);
+            if (busStopId.equals(bmta_id_second) || busStopId.equals(bmta_id))
+                NotificationBus(bmta_id_second, stopName, predict_time);
         } else {
             //When click Cancel
         }
@@ -173,7 +181,7 @@ public class BusFragment extends Fragment {
                 .setSmallIcon(R.drawable.bus_icon)
                 .setContentIntent(pIntent)
                 .setSound(soundUri)
-                .setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
+                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
                 .build();
         NotificationManager notificationManager = (NotificationManager) getContext()
                 .getSystemService(Context.NOTIFICATION_SERVICE);
@@ -230,33 +238,69 @@ public class BusFragment extends Fragment {
 
             if (busStopId == null)
                 busStopId = "";
-            final CharSequence[] items = {"แจ้งเตือนก่อนถึงป้าย 10 นาที", "แจ้งเตือนก่อนถึงหนึ่งป้าย", "ยกเลิก"};
+            final CharSequence[] items = {"เตือนก่อนรถถึงป้าย 10 นาที", "เตือนล่วงหน้า 2 ป้าย", "ยกเลิก"};
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setItems(items, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int position) {
-                    switch (position) {
-                        case 0:
-                            notificationMod = MOD_NOTI_TIME10;
-                            break;
-                        case 1:
-                            notificationMod = MOD_NOTI_NEXT_TO;
-                            break;
-                        case 2:
-                            notificationMod = MOD_NOTI_CANCEL;
-                            sharedPreNoTiBus.resetSharedPreNoTiBus();
-                            busStopListAdapter.notifyDataSetChanged();
-                            break;
-                        default:
-                            notificationMod = MOD_NOTI_CANCEL;
-                            sharedPreNoTiBus.resetSharedPreNoTiBus();
-                            busStopListAdapter.notifyDataSetChanged();
-                    }
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
 
-                }
-            });
-            AlertDialog alert = builder.create();
-            alert.show();
+            //alertDialogBuilder.setTitle("Set limit article");
+
+            alertDialogBuilder.setSingleChoiceItems(items, sharedPreNoTiBus.getTypeNotiBus()
+                    , new DialogInterface.OnClickListener() {
+
+                        public void onClick(DialogInterface dialog, int position) {
+
+                            switch (position) {
+                                case 0:
+                                    notificationMod = MOD_NOTI_TIME10;
+                                    sharedPreNoTiBus.setTypeNotiBus(0);
+                                    break;
+                                case 1:
+                                    notificationMod = MOD_NOTI_NEXT_TO;
+                                    sharedPreNoTiBus.setTypeNotiBus(1);
+                                    break;
+                                case 2:
+                                    notificationMod = MOD_NOTI_CANCEL;
+                                    sharedPreNoTiBus.resetSharedPreNoTiBus();
+                                    busStopListAdapter.notifyDataSetChanged();
+                                    sharedPreNoTiBus.setTypeNotiBus(-1);
+                                    break;
+                                default:
+                                    notificationMod = MOD_NOTI_CANCEL;
+                                    sharedPreNoTiBus.resetSharedPreNoTiBus();
+                                    busStopListAdapter.notifyDataSetChanged();
+                            }
+
+
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialogBuilder.show();
+
+//            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//            builder.setItems(items, new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int position) {
+//                    switch (position) {
+//                        case 0:
+//                            notificationMod = MOD_NOTI_TIME10;
+//                            break;
+//                        case 1:
+//                            notificationMod = MOD_NOTI_NEXT_TO;
+//                            break;
+//                        case 2:
+//                            notificationMod = MOD_NOTI_CANCEL;
+//                            sharedPreNoTiBus.resetSharedPreNoTiBus();
+//                            busStopListAdapter.notifyDataSetChanged();
+//                            break;
+//                        default:
+//                            notificationMod = MOD_NOTI_CANCEL;
+//                            sharedPreNoTiBus.resetSharedPreNoTiBus();
+//                            busStopListAdapter.notifyDataSetChanged();
+//                    }
+//
+//                }
+//            });
+//            AlertDialog alert = builder.create();
+//            alert.show();
             sharedPreNoTiBus.resetSharedPreNoTiBus();
             sharedPreNoTiBus.setNotiBus(busStopId);
             busStopListAdapter.notifyDataSetChanged();
@@ -278,7 +322,7 @@ public class BusFragment extends Fragment {
                 busStopListAdapter.setData(dao);
                 lv_BusStop.setAdapter(busStopListAdapter);
 
-                showNotification(dao.get(0).getStopId().toString()
+                showNotification(dao.get(0).getStopId().toString(), dao.get(1).getStopId().toString()
                         , dao.get(0).getStopName()
                         , dao.get(0).getPredictTime());
 

@@ -7,5 +7,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
+    <style name="BrandedSwitch.control" parent="Theme.AppCompat.Light">
+        <!-- active thumb & track color (30% transparency) -->
+        <item name="colorControlActivated">#e6e600</item>
+        <item name="colorSwitchThumbNormal">#cc0000</item>
+    </style>
 </resources>

@@ -34,9 +34,16 @@ public class SharedPreNoTiBus {
         editorNoTiBus.putString("busStopId", busStopId);
         editorNoTiBus.commit();
     }
-
+    public void setTypeNotiBus(int position) {
+        editorNoTiBus.putInt("typeNotiBus", position);
+        editorNoTiBus.commit();
+    }
     public String getNotiBus() {
         return sharedPerfsNoTiBus.getString("busStopId", "busStopId");
+    }
+
+    public int getTypeNotiBus() {
+        return sharedPerfsNoTiBus.getInt("typeNotiBus", -1);
     }
 
 

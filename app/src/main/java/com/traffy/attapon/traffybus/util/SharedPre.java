@@ -17,7 +17,6 @@ public class SharedPre {
     static String perfsName2 = "UserHelper";
 
 
-
     public SharedPre(Context context) {
         this.context = context;
 
@@ -31,9 +30,9 @@ public class SharedPre {
         }
 
     }
-    public int getPage() {
 
-            return sharedPerfs.getInt("page", 0);
+    public int getPage() {
+        return sharedPerfs.getInt("page", 0);
     }
 
     public void setPage(int page) {
@@ -47,6 +46,7 @@ public class SharedPre {
         editor.clear();
         editor.commit();
     }
+
     public void reSetSharedPreAlertNoti() {
         editor2.clear();
         editor2.commit();
@@ -71,10 +71,6 @@ public class SharedPre {
 
         return sharedPerfs2.getString(idAlertNoti, null);
     }
-
-
-
-
 
 
 }

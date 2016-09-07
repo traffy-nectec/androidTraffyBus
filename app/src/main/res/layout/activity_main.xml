@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_swipe"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,11 +21,15 @@
             android:id="@+id/swt_noti"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:background="@color/colorPrimary"
             android:checked="false"
+            android:contentDescription="เปิดแจ้งเตือนรถถึงก่อนป้าย 10 นาที"
             android:paddingLeft="10dp"
-            android:text="เลื่อนเพื่อเปิดการแจ้งเตือน"
-            android:textColor="#fff" />
+            android:text="สาย"
+            android:textColor="#fff"
+            android:thumb="@drawable/switch_compat_custom"
+            app:track="@drawable/switch_track_custom" />
 
         <ListView
             android:id="@+id/lv_header"

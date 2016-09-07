@@ -24,6 +24,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -154,6 +155,7 @@ public class SimpleFragment extends Fragment {
         cd = new ConnectionDetector(getActivity());
 
         lvBuslist.setOnItemClickListener(new lvBusListOnItemClickListener());
+        lvHeader.setOnTouchListener(new lvHeaderOnTouchListener());
 
         mHelper = new MyDbHelper(getActivity());
         mDb = mHelper.getWritableDatabase();
@@ -165,7 +167,9 @@ public class SimpleFragment extends Fragment {
         imNetConnect.setVisibility(View.INVISIBLE);
 
 
-        if (position == 1) swt_noti.setVisibility(View.GONE);
+        if (position == 1) {
+            swt_noti.setVisibility(View.GONE);
+        }
         sharedPre = new SharedPre(getActivity());
         sharedPre.setNoti(false);
         swt_noti.setOnCheckedChangeListener(new swtNoTiOnCheckedChangeListener());
@@ -392,20 +396,23 @@ public class SimpleFragment extends Fragment {
             map = new HashMap<String, String>();
 
             if (json.getString("status").equals("inbound")) {
-                route = "สาย 73ก อู่ส่วนสยาม-สะพานพุทธ มุ่งหน้า";
+                //route = "สาย 73ก อู่ส่วนสยาม-สะพานพุทธ มุ่งหน้า";
                 stopName = json.getString("stop_name");
+                swt_noti.setText("สาย 73ก สะพานพุทธ-อู่ส่วนสยาม มุ่งหน้า");
                 map.put("bus_route", "สาย 73ก อู่ส่วนสยาม-สะพานพุทธ มุ่งหน้า");
                 map.put("stop_name", json.getString("stop_name"));
                 MyArrList.add(map);
             } else if (json.getString("status").equals("outbound")) {
-                route = "สาย 73ก สะพานพุทธ-อู่ส่วนสยาม มุ่งหน้า";
+                //route = "สาย 73ก สะพานพุทธ-อู่ส่วนสยาม มุ่งหน้า";
+                swt_noti.setText("สาย 73ก สะพานพุทธ-อู่ส่วนสยาม มุ่งหน้า");
                 stopName = json.getString("stop_name");
                 map.put("bus_route", "สาย 73ก สะพานพุทธ-อู่ส่วนสยาม มุ่งหน้า");
                 map.put("stop_name", json.getString("stop_name"));
                 MyArrList.add(map);
             } else {
-                route = "สาย 73ก สะพานพุทธ-อู่ส่วนสยาม มุ่งหน้า";
+                //route = "สาย 73ก สะพานพุทธ-อู่ส่วนสยาม มุ่งหน้า";
                 stopName = "asdf";
+                swt_noti.setText("สาย 73ก สะพานพุทธ-อู่ส่วนสยาม มุ่งหน้า");
                 map.put("bus_route", "สาย 73ก สะพานพุทธ-อู่ส่วนสยาม มุ่งหน้า");
                 map.put("stop_name", "ไม่พบป้ายตรงข้าม");
                 MyArrList.add(map);
@@ -418,7 +425,7 @@ public class SimpleFragment extends Fragment {
 
                 sAdap = new SimpleAdapter(getActivity(), MyArrList, R.layout.header_layout
                         , new String[]{"bus_route", "stop_name"}
-                        , new int[]{R.id.tv_bus_route, R.id.tv_stop_name});
+                        , new int[]{R.id.tv_stop_name});
                 //  setSizHeader("สนามกีฬาแห่งชาติ", route);
                 lvHeader.setAdapter(sAdap);
 
@@ -440,6 +447,7 @@ public class SimpleFragment extends Fragment {
             SimpleAdapter sAdap;
             sAdap = new SimpleAdapter(getActivity(), MyArrList, R.layout.header_layout, new String[]{"bus_route", "stop_name"}, new int[]{R.id.tv_bus_route, R.id.tv_stop_name});
             setSizHeader("ไม่พบป้ายตรงข้าม", "สาย 73ก สะพานพุทธ-อู่ส่วนสยาม");
+            swt_noti.setText("สาย 73ก สะพานพุทธ-อู่ส่วนสยาม มุ่งหน้า");
             lvHeader.setAdapter(sAdap);
         }
     }
@@ -467,6 +475,9 @@ public class SimpleFragment extends Fragment {
 
                 } else {
                     //  Log.d("position", sharedPre.getPage() + " shared " + swt_noti.isChecked() + " - " + sharedPre.getNoti());
+                    if (sharedPre.getPage() == 0) {
+
+                    }
                     if (position == sharedPre.getPage() && sharedPre.getNoti()) {
 
                         //   Log.d("position ------", "" + sharedPre.getAlertNoti(c.getString("bmta_id")));
@@ -608,7 +619,7 @@ public class SimpleFragment extends Fragment {
 
     private void setSizHeader(String txt, String route) {
 
-        inOut.setText(route);
+//        inOut.setText(route);
         headerValue.setText(txt);
         lvHeader.addHeaderView(header);
 
@@ -657,11 +668,18 @@ public class SimpleFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             TextView textView = (TextView) view.findViewById(R.id.lv_bmta_id);
             String busId = textView.getText().toString();
-            Toast.makeText(getActivity(),"คุณขึ้นรถหมายเลข "+ busId , Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "คุณขึ้นรถหมายเลข " + busId, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getActivity(), BusActivity.class);
             intent.putExtra("busId", busId);
             startActivity(intent);
 
+        }
+    }
+
+    private static class lvHeaderOnTouchListener implements View.OnTouchListener {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            return (event.getAction() == MotionEvent.ACTION_MOVE);
         }
     }
 
@@ -673,10 +691,12 @@ public class SimpleFragment extends Fragment {
 
             if (isChecked) {
                 sharedPre.setNoti(true);
-                swt_noti.setText("เลื่อนเพื่อปิดการแจ้งเตือน");
+                //swt_noti.setText("เลื่อนเพื่อปิดการแจ้งเตือน");
+                showToastShort("เปิดการแจ้งเตือน");
             } else {
                 sharedPre.setNoti(false);
-                swt_noti.setText("เลื่อนเพื่อเปิดการแจ้งเตือน");
+                // swt_noti.setText("เลื่อนเพื่อเปิดการแจ้งเตือน");
+                showToastShort("ปิดการแจ้งเตือน");
             }
 
         }
