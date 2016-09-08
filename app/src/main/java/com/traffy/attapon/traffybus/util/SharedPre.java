@@ -32,7 +32,13 @@ public class SharedPre {
     }
 
     public int getPage() {
-        return sharedPerfs.getInt("page", 0);
+        int page;
+        try {
+            page = sharedPerfs.getInt("page", 0);
+        } catch (NullPointerException e) {
+            page = 0;
+        }
+        return page;
     }
 
     public void setPage(int page) {
@@ -58,8 +64,13 @@ public class SharedPre {
     }
 
     public boolean getNoti() {
-
-        return sharedPerfs.getBoolean("noTi", false);
+        boolean noti;
+        try {
+            noti = sharedPerfs.getBoolean("noTi", false);
+        } catch (NullPointerException e) {
+            return false;
+        }
+        return noti;
     }
 
     public void setAlertNoti(String idAlertNoti) {
